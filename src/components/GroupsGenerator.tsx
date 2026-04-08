@@ -3,7 +3,7 @@ import { useSupabaseItems } from '../hooks/useSupabaseItems';
 import type { Group } from '../types';
 import { InputList } from './InputList';
 import { ResultDisplay } from './ResultDisplay';
-import { Users } from 'lucide-react';
+import { Users, Loader2 } from 'lucide-react';
 
 const GROUPS_COUNT_KEY = 'sorteador_groups_count';
 
@@ -16,6 +16,8 @@ export function GroupsGenerator() {
     });
 
     const [groups, setGroups] = useState<Group[] | null>(null);
+    const [isDrawing, setIsDrawing] = useState(false);
+    const [currentDrawn, setCurrentDrawn] = useState<string | null>(null);
 
     // Removido o useEffect do STORAGE_KEY pois agora usamos Supabase
 
@@ -24,24 +26,86 @@ export function GroupsGenerator() {
     }, [groupCount]);
 
     const handleGenerate = () => {
-        if (items.length < groupCount) return;
+        if (items.length < groupCount || isDrawing) return;
+
+        setIsDrawing(true);
+        setCurrentDrawn("Iniciando sorteio...");
 
         // Shuffle array
-        const shuffled = [...items].sort(() => Math.random() - 0.5);
+        let shuffled = [...items].sort(() => Math.random() - 0.5);
 
-        // Create groups
-        const newGroups: Group[] = Array.from({ length: groupCount }, (_, i) => ({
+        // Rig logic: force specific teams to alternate groups (Group A -> index 0, Group B -> index 1)
+        if (groupCount === 2) {
+            const RIG_A = ["tropical", "ponto certo", "celeste", "tayuan"];
+            const RIG_B = ["históricos", "historicos", "tyt", "avalanche", "eagles"];
+
+            const isRigA = (name: string) => RIG_A.includes(name.trim().toLowerCase());
+            const isRigB = (name: string) => RIG_B.includes(name.trim().toLowerCase());
+
+            const poolA = shuffled.filter(p => isRigA(p.name));
+            const poolB = shuffled.filter(p => isRigB(p.name));
+            const others = shuffled.filter(p => !isRigA(p.name) && !isRigB(p.name));
+            
+            const riggedArray: typeof items = [];
+            let aIndex = 0;
+            let bIndex = 0;
+            let othersIndex = 0;
+
+            for (let i = 0; i < items.length; i++) {
+                if (i % 2 === 0) {
+                    if (aIndex < poolA.length) riggedArray.push(poolA[aIndex++]);
+                    else if (othersIndex < others.length) riggedArray.push(others[othersIndex++]);
+                    else if (bIndex < poolB.length) riggedArray.push(poolB[bIndex++]);
+                } else {
+                    if (bIndex < poolB.length) riggedArray.push(poolB[bIndex++]);
+                    else if (othersIndex < others.length) riggedArray.push(others[othersIndex++]);
+                    else if (aIndex < poolA.length) riggedArray.push(poolA[aIndex++]);
+                }
+            }
+            shuffled = riggedArray;
+        }
+
+        // Setup base groups with names "Grupo A", "Grupo B", etc.
+        const initialGroups: Group[] = Array.from({ length: groupCount }, (_, i) => ({
             id: crypto.randomUUID(),
-            name: `Time ${i + 1}`,
+            name: `Grupo ${String.fromCharCode(65 + i)}`,
             members: []
         }));
 
-        // Distribute evenly
-        shuffled.forEach((participant, index) => {
-            newGroups[index % groupCount].members.push(participant);
-        });
+        setGroups(initialGroups);
 
-        setGroups(newGroups);
+        let currentIndex = 0;
+
+        const drawNext = () => {
+            if (currentIndex >= shuffled.length) {
+                setCurrentDrawn(null);
+                setIsDrawing(false);
+                return;
+            }
+
+            const participant = shuffled[currentIndex];
+            const targetGroupIndex = currentIndex % groupCount;
+
+            setCurrentDrawn(`Sorteando para o ${initialGroups[targetGroupIndex].name}...`);
+
+            setTimeout(() => {
+                setCurrentDrawn(`${participant.name} foi para o ${initialGroups[targetGroupIndex].name}!`);
+                
+                setGroups(prev => {
+                    if (!prev) return prev;
+                    const newStats = [...prev];
+                    const updatedGroup = { ...newStats[targetGroupIndex] };
+                    updatedGroup.members = [...updatedGroup.members, participant];
+                    newStats[targetGroupIndex] = updatedGroup;
+                    return newStats;
+                });
+
+                currentIndex++;
+                setTimeout(drawNext, 1200); 
+            }, 800); 
+        };
+
+        drawNext();
     };
 
     const getResultAsText = () => {
@@ -82,10 +146,19 @@ export function GroupsGenerator() {
                     <button
                         className="btn-primary w-full mt-2"
                         onClick={handleGenerate}
-                        disabled={items.length < groupCount}
+                        disabled={items.length < groupCount || isDrawing}
                     >
-                        <Users className="w-4 h-4 mr-2" />
-                        Gerar Times
+                        {isDrawing ? (
+                            <>
+                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                Sorteando...
+                            </>
+                        ) : (
+                            <>
+                                <Users className="w-4 h-4 mr-2" />
+                                Gerar Times
+                            </>
+                        )}
                     </button>
                 </div>
             </div>
@@ -97,32 +170,47 @@ export function GroupsGenerator() {
                         <p>Adicione os participantes e gere os times para ver o resultado</p>
                     </div>
                 ) : (
-                    <ResultDisplay
-                        title="Times Sorteados"
-                        resultAsText={getResultAsText()}
-                        onClear={() => setGroups(null)}
-                    >
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {groups.map(group => (
-                                <div key={group.id} className="bg-background border border-border rounded-lg p-4 shadow-sm hover:border-primary/30 transition-colors">
-                                    <div className="flex items-center justify-between border-b border-border/50 pb-2 mb-3">
-                                        <h4 className="font-bold text-foreground">{group.name}</h4>
-                                        <span className="text-xs bg-muted px-2 py-1 rounded-md font-medium">
-                                            {group.members.length} {group.members.length === 1 ? 'membro' : 'membros'}
-                                        </span>
-                                    </div>
-                                    <ul className="space-y-1.5 pl-1">
-                                        {group.members.map(member => (
-                                            <li key={member.id} className="text-sm flex items-center gap-2">
-                                                <div className="w-1.5 h-1.5 rounded-full bg-primary/40" />
-                                                {member.name}
-                                            </li>
-                                        ))}
-                                    </ul>
+                    <div className="flex flex-col gap-6">
+                        {isDrawing && currentDrawn && (
+                            <div className="card p-6 text-center animate-in fade-in zoom-in slide-in-from-top-4 bg-primary/5 border-primary/20 shadow-md">
+                                <div className="text-xl md:text-2xl font-bold text-primary">
+                                    {currentDrawn}
                                 </div>
-                            ))}
-                        </div>
-                    </ResultDisplay>
+                            </div>
+                        )}
+                        <ResultDisplay
+                            title="Times Sorteados"
+                            resultAsText={getResultAsText()}
+                            onClear={isDrawing ? undefined : () => setGroups(null)}
+                        >
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {groups.map(group => (
+                                    <div key={group.id} className="bg-background border border-border rounded-lg p-4 shadow-sm hover:border-primary/30 transition-colors">
+                                        <div className="flex items-center justify-between border-b border-border/50 pb-2 mb-3">
+                                            <h4 className="font-bold text-foreground">{group.name}</h4>
+                                            <span className="text-xs bg-muted px-2 py-1 rounded-md font-medium">
+                                                {group.members.length} {group.members.length === 1 ? 'membro' : 'membros'}
+                                            </span>
+                                        </div>
+                                        <ul className="space-y-1.5 pl-1">
+                                            {group.members.map(member => (
+                                                <li key={member.id} className="text-sm flex items-center gap-2 animate-in slide-in-from-left-2 fade-in duration-300">
+                                                    <div className="w-1.5 h-1.5 rounded-full bg-primary/40" />
+                                                    {member.name}
+                                                </li>
+                                            ))}
+                                            {isDrawing && group.members.length < Math.ceil(items.length / groupCount) && (
+                                                <li className="text-sm flex items-center gap-2 opacity-30">
+                                                    <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40 animate-pulse" />
+                                                    Aguardando...
+                                                </li>
+                                            )}
+                                        </ul>
+                                    </div>
+                                ))}
+                            </div>
+                        </ResultDisplay>
+                    </div>
                 )}
             </div>
         </div>
