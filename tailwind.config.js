@@ -7,7 +7,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: "#f5f5f5", // define sua cor personalizada
+        background: "#f5f5f5", // define sua cor personalizada, nao sei o pq esta funcionando
       },
     },
   },

@@ -21,16 +21,16 @@ export default defineConfig([
   {
     files: ['**/*.{ts,tsx}'],
     extends: [
-      // Other configs...
+      // outras configurações, não mexer aqui
 
-      // Remove tseslint.configs.recommended and replace with this
+      // remove a tseslint.configs.recommended
       tseslint.configs.recommendedTypeChecked,
       // Alternatively, use this for stricter rules
       tseslint.configs.strictTypeChecked,
       // Optionally, add this for stylistic rules
       tseslint.configs.stylisticTypeChecked,
 
-      // Other configs...
+      // outras configurações, não mexer aqui
     ],
     languageOptions: {
       parserOptions: {
