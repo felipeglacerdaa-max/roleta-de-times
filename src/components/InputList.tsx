@@ -24,7 +24,7 @@ export function InputList({ items, onChange, placeholder = 'Adicionar participan
         if (newNames.length === 0) return;
 
         const newItems: Participant[] = newNames.map(name => ({
-            id: crypto.randomUUID(),
+            id: Math.random().toString(36).substring(2, 10),
             name
         }));
 

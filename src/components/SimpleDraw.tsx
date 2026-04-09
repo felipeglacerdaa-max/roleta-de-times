@@ -6,7 +6,7 @@ import { Trophy, Dices, Shuffle } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 export function SimpleDraw() {
-    const { items, setItems } = useSupabaseItems('simple_draw_items');
+    const { items, setItems } = useSupabaseItems('group_items');
 
     const [winner, setWinner] = useState<Participant | null>(null);
     const [isDrawing, setIsDrawing] = useState(false);

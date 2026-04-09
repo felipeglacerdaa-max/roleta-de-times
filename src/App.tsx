@@ -9,13 +9,12 @@ import { Roulette } from './components/Roulette';
 function App() {
   const [currentMode, setCurrentMode] = useState<AppMode>('roulette');
 
-  const renderContent = () => {
+    const renderContent = () => {
     switch (currentMode) {
-      case 'roulette': return <Roulette />;
-      case 'groups': return <GroupsGenerator />;
+      case 'roulette': return <GroupsGenerator />;
       case 'duels': return <DuelsGenerator />;
       case 'simple': return <SimpleDraw />;
-      default: return <Roulette />;
+      default: return <GroupsGenerator />;
     }
   };
 
@@ -27,14 +26,12 @@ function App() {
         <div className="flex flex-col gap-6">
           <header className="mb-4">
             <h2 className="text-2xl md:text-3xl font-bold tracking-tight mb-2">
-              {currentMode === 'roulette' && 'Girar Roleta'}
-              {currentMode === 'groups' && 'Gerar Times e Grupos'}
+              {currentMode === 'roulette' && 'Roleta de Times'}
               {currentMode === 'duels' && 'Chaveamento e Confrontos'}
               {currentMode === 'simple' && 'Sorteio Rápido'}
             </h2>
             <p className="text-foreground/60 max-w-2xl">
-              {currentMode === 'roulette' && 'Adicione os participantes e gire a roleta para sortear um vencedor de forma interativa e justa.'}
-              {currentMode === 'groups' && 'Divida a lista de participantes em times ou grupos equilibrados automaticamente.'}
+              {currentMode === 'roulette' && 'Sorteie os participantes e divida-os em times ou grupos equilibrados automaticamente.'}
               {currentMode === 'duels' && 'Crie pares aleatórios para confrontos, ideal para torneios e dinâmicas 1 contra 1.'}
               {currentMode === 'simple' && 'Sorteie um ou mais itens rapidamente a partir da sua lista, sem animações complexas.'}
             </p>

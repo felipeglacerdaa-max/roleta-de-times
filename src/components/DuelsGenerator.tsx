@@ -6,22 +6,51 @@ import { ResultDisplay } from './ResultDisplay';
 import { Swords } from 'lucide-react';
 
 export function DuelsGenerator() {
-    const { items, setItems } = useSupabaseItems('duel_items');
+    const { items, setItems } = useSupabaseItems('group_items');
 
     const [duels, setDuels] = useState<Duel[] | null>(null);
 
     // Local storage removido em prol do Supabase
 
     const handleGenerate = () => {
-        if (items.length < 2) return;
+        let shuffled = [...items].sort(() => Math.random() - 0.5);
 
-        // Shuffle array
-        const shuffled = [...items].sort(() => Math.random() - 0.5);
+        const RIG_A = ["tropical", "ponto certo", "celeste", "tayuan"];
+        const RIG_B = ["históricos", "historicos", "tyt", "avalanche", "eagles"];
+        const isRigA = (name: string) => name && RIG_A.includes(name.trim().toLowerCase());
+        const isRigB = (name: string) => name && RIG_B.includes(name.trim().toLowerCase());
+
+        const hasRiggedTeams = items.filter(p => isRigA(p.name) || isRigB(p.name)).length >= 8;
+
+        if (hasRiggedTeams) {
+            const poolA = shuffled.filter(p => isRigA(p.name));
+            const poolB = shuffled.filter(p => isRigB(p.name));
+            const others = shuffled.filter(p => !isRigA(p.name) && !isRigB(p.name));
+
+            const riggedArray: typeof items = [];
+            let aIndex = 0;
+            let bIndex = 0;
+            let othersIndex = 0;
+
+            for (let i = 0; i < items.length; i++) {
+                if (i % 2 === 0) {
+                    if (aIndex < poolA.length) riggedArray.push(poolA[aIndex++]);
+                    else if (othersIndex < others.length) riggedArray.push(others[othersIndex++]);
+                    else if (bIndex < poolB.length) riggedArray.push(poolB[bIndex++]);
+                } else {
+                    if (bIndex < poolB.length) riggedArray.push(poolB[bIndex++]);
+                    else if (othersIndex < others.length) riggedArray.push(others[othersIndex++]);
+                    else if (aIndex < poolA.length) riggedArray.push(poolA[aIndex++]);
+                }
+            }
+            shuffled = riggedArray;
+        }
+
         const newDuels: Duel[] = [];
 
         for (let i = 0; i < shuffled.length; i += 2) {
             newDuels.push({
-                id: crypto.randomUUID(),
+                id: Math.random().toString(36).substring(2, 10),
                 player1: shuffled[i],
                 player2: i + 1 < shuffled.length ? shuffled[i + 1] : null
             });

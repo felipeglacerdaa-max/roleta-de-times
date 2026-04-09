@@ -10,7 +10,6 @@ interface NavbarProps {
 export function Navbar({ currentMode, onModeChange }: NavbarProps) {
     const tabs: { id: AppMode; label: string; icon: React.ReactNode }[] = [
         { id: 'roulette', label: 'Roleta', icon: <LayoutGrid className="w-4 h-4" /> },
-        { id: 'groups', label: 'Times / Grupos', icon: <Users className="w-4 h-4" /> },
         { id: 'duels', label: 'Confrontos', icon: <Swords className="w-4 h-4" /> },
         { id: 'simple', label: 'Sorteio Simples', icon: <Dices className="w-4 h-4" /> },
     ];

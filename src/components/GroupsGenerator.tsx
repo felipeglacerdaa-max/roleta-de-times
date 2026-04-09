@@ -67,7 +67,7 @@ export function GroupsGenerator() {
 
         // Setup base groups with names "Grupo A", "Grupo B", etc.
         const initialGroups: Group[] = Array.from({ length: groupCount }, (_, i) => ({
-            id: crypto.randomUUID(),
+            id: Math.random().toString(36).substring(2, 10),
             name: `Grupo ${String.fromCharCode(65 + i)}`,
             members: []
         }));
