@@ -4,7 +4,6 @@ import type { AppMode } from './types';
 import { SimpleDraw } from './components/SimpleDraw';
 import { GroupsGenerator } from './components/GroupsGenerator';
 import { DuelsGenerator } from './components/DuelsGenerator';
-import { Roulette } from './components/Roulette';
 
 function App() {
   const [currentMode, setCurrentMode] = useState<AppMode>('roulette');

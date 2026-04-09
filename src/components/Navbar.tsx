@@ -1,6 +1,6 @@
 import React from 'react';
 import type { AppMode } from '../types';
-import { LayoutGrid, Users, Swords, Dices } from 'lucide-react';
+import { LayoutGrid, Swords, Dices } from 'lucide-react';
 
 interface NavbarProps {
     currentMode: AppMode;
