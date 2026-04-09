@@ -12,7 +12,8 @@ export function GroupsGenerator() {
 
     const [groupCount, setGroupCount] = useState<number>(() => {
         const saved = localStorage.getItem(GROUPS_COUNT_KEY);
-        return saved ? parseInt(saved, 10) : 2;
+        const parsed = parseInt(saved || '2', 10);
+        return isNaN(parsed) || parsed < 2 ? 2 : parsed;
     });
 
     const [groups, setGroups] = useState<Group[] | null>(null);
@@ -42,9 +43,9 @@ export function GroupsGenerator() {
             const isRigA = (name?: string) => typeof name === 'string' && RIG_A.includes(name.trim().toLowerCase());
             const isRigB = (name?: string) => typeof name === 'string' && RIG_B.includes(name.trim().toLowerCase());
 
-            const poolA = shuffled.filter(p => isRigA(p.name));
-            const poolB = shuffled.filter(p => isRigB(p.name));
-            const others = shuffled.filter(p => !isRigA(p.name) && !isRigB(p.name));
+            const poolA = shuffled.filter(p => p && isRigA(p.name));
+            const poolB = shuffled.filter(p => p && isRigB(p.name));
+            const others = shuffled.filter(p => p && !isRigA(p.name) && !isRigB(p.name));
             
             const riggedArray: typeof items = [];
             let aIndex = 0;
@@ -84,12 +85,13 @@ export function GroupsGenerator() {
             }
 
             const participant = shuffled[currentIndex];
-            const targetGroupIndex = currentIndex % groupCount;
+            const targetGroupIndex = isNaN(groupCount) || groupCount < 2 ? 0 : (currentIndex % groupCount);
+            const targetGroup = initialGroups[targetGroupIndex];
 
-            setCurrentDrawn(`Sorteando para o ${initialGroups[targetGroupIndex].name}...`);
+            setCurrentDrawn(`Sorteando para o ${targetGroup?.name || 'Próximo Grupo'}...`);
 
             setTimeout(() => {
-                setCurrentDrawn(`${participant?.name || 'Participante'} foi para o ${initialGroups[targetGroupIndex]?.name}!`);
+                setCurrentDrawn(`${participant?.name || 'Participante'} foi para o ${targetGroup?.name || 'Próximo Grupo'}!`);
                 
                 setGroups(prev => {
                     if (!prev) return prev;
@@ -137,7 +139,10 @@ export function GroupsGenerator() {
                         min="2"
                         max="10"
                         value={groupCount}
-                        onChange={(e) => setGroupCount(parseInt(e.target.value))}
+                        onChange={(e) => {
+                            const val = parseInt(e.target.value, 10);
+                            setGroupCount(isNaN(val) || val < 2 ? 2 : val);
+                        }}
                         className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
                     />
                     <div className="flex justify-between text-xs text-foreground/40 mt-[-8px]">
