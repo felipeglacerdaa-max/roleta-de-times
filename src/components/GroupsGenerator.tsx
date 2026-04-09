@@ -39,8 +39,8 @@ export function GroupsGenerator() {
             const RIG_A = ["tropical", "ponto certo", "celeste", "tayuan"];
             const RIG_B = ["históricos", "historicos", "tyt", "avalanche", "eagles"];
 
-            const isRigA = (name: string) => RIG_A.includes(name.trim().toLowerCase());
-            const isRigB = (name: string) => RIG_B.includes(name.trim().toLowerCase());
+            const isRigA = (name?: string) => typeof name === 'string' && RIG_A.includes(name.trim().toLowerCase());
+            const isRigB = (name?: string) => typeof name === 'string' && RIG_B.includes(name.trim().toLowerCase());
 
             const poolA = shuffled.filter(p => isRigA(p.name));
             const poolB = shuffled.filter(p => isRigB(p.name));
@@ -89,13 +89,15 @@ export function GroupsGenerator() {
             setCurrentDrawn(`Sorteando para o ${initialGroups[targetGroupIndex].name}...`);
 
             setTimeout(() => {
-                setCurrentDrawn(`${participant.name} foi para o ${initialGroups[targetGroupIndex].name}!`);
+                setCurrentDrawn(`${participant?.name || 'Participante'} foi para o ${initialGroups[targetGroupIndex]?.name}!`);
                 
                 setGroups(prev => {
                     if (!prev) return prev;
                     const newStats = [...prev];
                     const updatedGroup = { ...newStats[targetGroupIndex] };
-                    updatedGroup.members = [...updatedGroup.members, participant];
+                    if (participant) {
+                        updatedGroup.members = [...updatedGroup.members, participant];
+                    }
                     newStats[targetGroupIndex] = updatedGroup;
                     return newStats;
                 });

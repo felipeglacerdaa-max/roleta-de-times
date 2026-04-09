@@ -17,8 +17,8 @@ export function DuelsGenerator() {
 
         const RIG_A = ["tropical", "ponto certo", "celeste", "tayuan"];
         const RIG_B = ["históricos", "historicos", "tyt", "avalanche", "eagles"];
-        const isRigA = (name: string) => name && RIG_A.includes(name.trim().toLowerCase());
-        const isRigB = (name: string) => name && RIG_B.includes(name.trim().toLowerCase());
+        const isRigA = (name?: string) => typeof name === 'string' && RIG_A.includes(name.trim().toLowerCase());
+        const isRigB = (name?: string) => typeof name === 'string' && RIG_B.includes(name.trim().toLowerCase());
 
         const hasRiggedTeams = items.filter(p => isRigA(p.name) || isRigB(p.name)).length >= 8;
 
@@ -62,8 +62,8 @@ export function DuelsGenerator() {
     const getResultAsText = () => {
         if (!duels) return '';
         return duels.map((d, i) => {
-            const p2Name = d.player2 ? d.player2.name : '(Passa Direto / Bye)';
-            return `Confronto ${i + 1}: ${d.player1.name} x ${p2Name}`;
+            const p2Name = d.player2 ? (d.player2.name || 'Vazio') : '(Passa Direto / Bye)';
+            return `Confronto ${i + 1}: ${d.player1?.name || 'Vazio'} x ${p2Name}`;
         }).join('\n');
     };
 
@@ -108,7 +108,7 @@ export function DuelsGenerator() {
                                     <div className="absolute top-0 bottom-0 left-0 w-1 bg-primary/20 group-hover:bg-primary/50 transition-colors" />
 
                                     <div className="flex-1 w-full text-center sm:text-right font-medium text-foreground pr-0 sm:pr-4">
-                                        {duel.player1.name}
+                                        {duel.player1?.name || 'Vazio'}
                                     </div>
 
                                     <div className="flex items-center justify-center px-4 py-1.5 bg-muted rounded-full">
@@ -119,7 +119,7 @@ export function DuelsGenerator() {
                                     </div>
 
                                     <div className={`flex-1 w-full text-center sm:text-left font-medium pl-0 sm:pl-4 ${!duel.player2 ? 'text-foreground/40 italic' : 'text-foreground'}`}>
-                                        {duel.player2 ? duel.player2.name : '(Passa Direto / Bye)'}
+                                        {duel.player2 ? (duel.player2.name || 'Vazio') : '(Passa Direto / Bye)'}
                                     </div>
                                 </div>
                             ))}
