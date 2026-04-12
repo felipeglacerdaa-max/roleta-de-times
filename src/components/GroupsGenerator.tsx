@@ -46,7 +46,7 @@ export function GroupsGenerator() {
             const poolA = shuffled.filter(p => p && isRigA(p.name));
             const poolB = shuffled.filter(p => p && isRigB(p.name));
             const others = shuffled.filter(p => p && !isRigA(p.name) && !isRigB(p.name));
-            
+
             const riggedArray: typeof items = [];
             let aIndex = 0;
             let bIndex = 0;
@@ -92,7 +92,7 @@ export function GroupsGenerator() {
 
             setTimeout(() => {
                 setCurrentDrawn(`${participant?.name || 'Participante'} foi para o ${targetGroup?.name || 'Próximo Grupo'}!`);
-                
+
                 setGroups(prev => {
                     if (!prev) return prev;
                     const newStats = [...prev];
@@ -105,8 +105,8 @@ export function GroupsGenerator() {
                 });
 
                 currentIndex++;
-                setTimeout(drawNext, 1200); 
-            }, 800); 
+                setTimeout(drawNext, 1200);
+            }, 800);
         };
 
         drawNext();
