@@ -37,8 +37,8 @@ export function GroupsGenerator() {
 
         // Rig logic: force specific teams to alternate groups (Group A -> index 0, Group B -> index 1)
         if (groupCount === 2) {
-            const RIG_A = ["tropical", "ponto certo", "celeste", "tayuan"];
-            const RIG_B = ["históricos", "historicos", "tyt", "avalanche", "eagles"];
+            const RIG_A = ["tropical", "tyt", "tyc", "celeste", "tayuan"];
+            const RIG_B = ["históricos", "historicos", "ponto certo", "ponto certyo", "avalanche", "eagles"];
 
             const isRigA = (name?: string) => typeof name === 'string' && RIG_A.includes(name.trim().toLowerCase());
             const isRigB = (name?: string) => typeof name === 'string' && RIG_B.includes(name.trim().toLowerCase());

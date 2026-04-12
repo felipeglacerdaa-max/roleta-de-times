@@ -15,8 +15,8 @@ export function DuelsGenerator() {
     const handleGenerate = () => {
         let shuffled = [...items].sort(() => Math.random() - 0.5);
 
-        const RIG_A = ["tropical", "ponto certo", "celeste", "tayuan"];
-        const RIG_B = ["históricos", "historicos", "tyt", "avalanche", "eagles"];
+        const RIG_A = ["tropical", "tyt", "tyc", "celeste", "tayuan"];
+        const RIG_B = ["históricos", "historicos", "ponto certo", "ponto certyo", "avalanche", "eagles"];
         const isRigA = (name?: string) => typeof name === 'string' && RIG_A.includes(name.trim().toLowerCase());
         const isRigB = (name?: string) => typeof name === 'string' && RIG_B.includes(name.trim().toLowerCase());
 
