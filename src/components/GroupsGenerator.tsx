@@ -37,11 +37,22 @@ export function GroupsGenerator() {
 
         // Rig logic: force specific teams to alternate groups (Group A -> index 0, Group B -> index 1)
         if (groupCount === 2) {
-            const RIG_A = ["tropical", "tyt", "tyc", "celeste", "tayuan"];
-            const RIG_B = ["históricos", "historicos", "ponto certo", "ponto certyo", "avalanche", "eagles"];
+            const RIG_A_MASC = ["tropical", "tyt", "tyc", "celeste", "tayuan"];
+            const RIG_B_MASC = ["históricos", "historicos", "ponto certo", "ponto certyo", "avalanche", "eagles"];
+            
+            const RIG_A_FEM = ["vôlei e cia", "volei e cia", "lycans", "históricos", "historicos"];
+            const RIG_B_FEM = ["eagles", "tropical", "fênix", "fenix"];
 
-            const isRigA = (name?: string) => typeof name === 'string' && RIG_A.includes(name.trim().toLowerCase());
-            const isRigB = (name?: string) => typeof name === 'string' && RIG_B.includes(name.trim().toLowerCase());
+            const isFeminino = items.some(p => {
+                const n = p?.name?.trim().toLowerCase();
+                return n === "vôlei e cia" || n === "volei e cia" || n === "lycans" || n === "fênix" || n === "fenix";
+            });
+
+            const currentRigA = isFeminino ? RIG_A_FEM : RIG_A_MASC;
+            const currentRigB = isFeminino ? RIG_B_FEM : RIG_B_MASC;
+
+            const isRigA = (name?: string) => typeof name === 'string' && currentRigA.includes(name.trim().toLowerCase());
+            const isRigB = (name?: string) => typeof name === 'string' && currentRigB.includes(name.trim().toLowerCase());
 
             const poolA = shuffled.filter(p => p && isRigA(p.name));
             const poolB = shuffled.filter(p => p && isRigB(p.name));
